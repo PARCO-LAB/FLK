@@ -24,6 +24,9 @@ class Link():
 
 class DAG():
     
+    def compute_distance(self,a,b):
+        return np.sqrt( np.power(a[0]-b[0],2)+np.power(a[1]-b[1],2)+np.power(a[2]-b[2],2) )
+
     def __init__(self, skeleton, keypoints):
         
         # For each keypoint create a node ad set the initial position
@@ -48,17 +51,30 @@ class DAG():
             try:
                 i1 = [idx for idx, l in enumerate(names) if b.from_kp in l][0]
                 i2 = [idx for idx, l in enumerate(names) if b.to_kp in l][0]
-                b.append(compute_distance(s[3*i1:3*i1+3],s[3*i2:3*i2+3]))
+                b.append(self.compute_distance(s[3*i1:3*i1+3],s[3*i2:3*i2+3]))
             except:
                 pass
     
-    def correct(self):
-        pass
+
 
 class BCA():
-    
     def __init__(self,skeleton, keypoints):
         self.DAG = DAG(skeleton,keypoints)
-        print([b.lengths for b in self.DAG.bones])
+        self.epsilon = 0.01 # bone-length error treshold
+        #print([b.lengths for b in self.DAG.bones])
     
-    
+    def correct(self,s,names):
+        
+        # Update with the current measurement
+        self.DAG.update_bone_length(s,names)
+        
+        # Check if there is anything to correct
+        for b in self.DAG.bones:
+            if b.length and abs(b.length - b.lengths[-1])/b.length > self.epsilon:
+                a_i = names.index(b.from_kp)
+                b_i = names.index(b.to_kp)
+                A = s[3*a_i:3*a_i+3]
+                B = s[3*b_i:3*b_i+3]
+                s[3*b_i:3*b_i+3] = b.length * (B-A) / np.linalg.norm(B-A) + A
+        
+        return s           

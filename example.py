@@ -1,6 +1,7 @@
 import pandas as pd
-
+import numpy as np
 from FLK import FLK
+from lib.utils import evaluate
 
 def main():
     
@@ -9,19 +10,33 @@ def main():
                  "Head","LShoulder","LElbow","LWrist","RShoulder","RElbow","RWrist"]
 
     # Load the file
-    data = pd.read_csv("data/S9_Walking.csv")
+    data = pd.read_csv("data/S9_Walking_Ray3D_CPN_cam1.csv")
+    refined = data.copy()
+    ground_truth = pd.read_csv("data/S9_Walking_ground_truth.csv")
+
+    evaluate(data,ground_truth)
 
     # Get the first skeleton of the sequence
     first_skeleton = data.iloc[0,:].values[1:]
 
     # Initialize FLK
-    flk = FLK( skeleton=first_skeleton, keypoints=keypoints, model_path="models/GRU" )
+    flk = FLK( fs=50, skeleton=first_skeleton, keypoints=keypoints, model_path="models/GRU.h5" )
+    #flk.AKF.is_RNN_enabled = False
     flk.latency = 0
 
-    #for k in range(1,len(data.shape[0])):
-    print(flk.predict())
-
+    for k in range(1, data.shape[0]):
+        skeleton = data.iloc[k,:].values[1:]
+        if np.any(skeleton):
+            # It is robust to NaN (flk.correct comprehends the prediction)
+            filtered_skeleton = flk.correct(skeleton)
+        else:
+            filtered_skeleton = flk.predict()
+        
+        refined.iloc[k,:].values[1:] = filtered_skeleton
+    
+    evaluate(refined,ground_truth)
+    
+    refined.to_csv("data/S9_Walking_output.csv")
 
 if __name__ == "__main__":
     main()
-    

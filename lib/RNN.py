@@ -13,6 +13,7 @@ class GRU():
         self.raw = []
         self.window = len_size        
         self.model = keras.models.load_model(model_path)
+        #print(self.model.summary())
         self.keypoints = ['RHip','RKnee','RAnkle','LHip','LKnee','LAnkle','LShoulder','LElbow','LWrist','RShoulder','RElbow','RWrist']
         
         # Create conversion maps from the input model to H36M13
@@ -49,6 +50,7 @@ class GRU():
 
         
     def predict(self):
+        
         if len(self.history) == self.window:
             input = self.data.reshape(1,self.data.shape[0], self.data.shape[1])
             

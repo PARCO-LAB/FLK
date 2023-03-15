@@ -1,6 +1,5 @@
 import numpy as np
 from lib.RNN import GRU
-from lib.utils import compute_distance
 
 class LKF():
     def __init__(self,s):
@@ -33,11 +32,11 @@ class LKF():
 
 class AKF():
     
-    def __init__(self,skeleton,keypoints,model_path):
-
+    def __init__(self,fs,skeleton,keypoints,model_path):
+        
         # Initialize a Linear Kalman Filter for each coordinate of all joints
         self.lkf = [LKF(skeleton[i]) for i in range(3*len(keypoints))]
-        
+        self.fs = fs
         # Configure the prediction model
         if model_path:
             self.model = GRU(model_path = model_path, len_size=64, names=keypoints)
@@ -48,6 +47,7 @@ class AKF():
 
         self.alpha = 0.01
         self.theta = 0.75
+        self.old_skeleton = skeleton.copy()
 
     def predict(self):
         if self.is_RNN_enabled:
@@ -55,9 +55,41 @@ class AKF():
             next = next.reshape( (self.model.model_to_generic.shape[0],))
             return next
         else:
-            return None        
+            return self.model.raw[-1]        
 
-    def correct(self,old_skeleton):
+    def compute_distance(self,a,b):
+        return np.sqrt( np.power(a[0]-b[0],2)+np.power(a[1]-b[1],2)+np.power(a[2]-b[2],2) )
+
+    def correct(self,skeleton):
+
+        # First of all predict the current frame
+        pred = self.predict()
+        confidence = []
+
+        out = skeleton.copy()
+
+        # Then correct the input skeleton with the 
         for j in range(0,len(self.lkf),3):
-            v = abs(compute_distance(out[j:j+3],old_skeleton[j:j+3]))/dt
+            v = abs(self.compute_distance(skeleton[j:j+3],self.old_skeleton[j:j+3]))/(1/self.fs)
+            v_pred = abs(self.compute_distance(pred[j:j+3],self.old_skeleton[j:j+3]))/(1/self.fs)
             c =  1 / (self.alpha*( v**2)+1)
+            confidence.append(c)
+            for k in range(0,3):
+                if c < self.theta or np.isnan(c):
+                    if not np.isnan(skeleton[j+k]):
+                        self.lkf[j+k].predict( pred[j+k], [(self.alpha-1)*np.exp(-self.alpha*v)+1])
+                        if self.lkf[j+k].wasnan:
+                            self.lkf[j+k].update(skeleton[j+k],0)
+                            self.lkf[j+k].wasnan = False
+                        else:
+                            self.lkf[j+k].update(skeleton[j+k],[self.alpha*v**2])
+                    else:
+                        self.lkf[j+k].predict( pred[j+k], [(self.alpha-1)*np.exp(-self.alpha*v_pred)+1])
+                        self.lkf[j+k].wasnan = True
+                    skeleton[j+k] = self.lkf[j+k].get_output()
+                else:
+                    self.lkf[j+k].X = np.array(skeleton[j+k])
+
+
+        self.model.append(skeleton.copy())
+        return skeleton
