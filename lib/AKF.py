@@ -60,6 +60,10 @@ class AKF():
     def compute_distance(self,a,b):
         return np.sqrt( np.power(a[0]-b[0],2)+np.power(a[1]-b[1],2)+np.power(a[2]-b[2],2) )
 
+    def reset(self):
+        if self.is_RNN_enabled:
+            self.model.reset()
+
     def correct(self,skeleton):
 
         # First of all predict the current frame

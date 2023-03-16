@@ -15,6 +15,10 @@ class Link():
         self.length = None
         self.lengths = []
 
+    def reset(self):
+        self.lengths = []
+        self.length = None
+
     def append(self,l):
         self.lengths.append(l) 
 
@@ -46,6 +50,10 @@ class DAG():
 
         self.update_bone_length(skeleton,keypoints)
 
+    def reset(self):
+        for b in self.bones:
+            b.reset()
+
     def update_bone_length(self,s,names):
         for b in self.bones:
             try:
@@ -61,8 +69,10 @@ class BCA():
     def __init__(self,skeleton, keypoints):
         self.DAG = DAG(skeleton,keypoints)
         self.epsilon = 0.01 # bone-length error treshold
-        #print([b.lengths for b in self.DAG.bones])
-    
+        
+    def reset(self):
+        self.DAG.reset()
+
     def correct(self,s,names):
         
         # Update with the current measurement

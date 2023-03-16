@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
-from FLK import FLK
+from lib.FLK import FLK
 from lib.utils import evaluate
+import matplotlib.pyplot as plt
 
 def main():
     
@@ -20,7 +21,7 @@ def main():
     first_skeleton = data.iloc[0,:].values[1:]
 
     # Initialize FLK
-    flk = FLK( fs=50, skeleton=first_skeleton, keypoints=keypoints, model_path="models/GRU.h5" )
+    flk = FLK( fs=50, skeleton=first_skeleton, keypoints=keypoints, model_path="models/GRU.h5" ,latency=0)
     #flk.AKF.is_RNN_enabled = False
     flk.latency = 0
 
@@ -34,8 +35,13 @@ def main():
         
         refined.iloc[k,:].values[1:] = filtered_skeleton
     
+    flk.reset()
+
     evaluate(refined,ground_truth)
     
+    plt.plot( data.iloc[:,0].values,data.iloc[:,1].values)
+    plt.plot( data.iloc[:,0].values,refined.iloc[:,1].values)
+    plt.show()
     refined.to_csv("data/S9_Walking_output.csv")
 
 if __name__ == "__main__":

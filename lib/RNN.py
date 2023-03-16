@@ -52,6 +52,7 @@ class GRU():
     def predict(self):
         
         if len(self.history) == self.window:
+
             input = self.data.reshape(1,self.data.shape[0], self.data.shape[1])
             
             y = self.model(input).numpy()
@@ -64,6 +65,11 @@ class GRU():
         else:
             out = np.array(self.raw[-1]) 
             return out, False
+
+    def reset(self):
+            self.history = []
+            self.raw = []
+
 
     def translate(self,sk,p):
         new_sk = np.zeros(sk.shape)
