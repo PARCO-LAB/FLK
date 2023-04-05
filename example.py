@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from lib.FLK import FLK
-from lib.utils import evaluate
+from FLK import FLK
+from FLK import evaluate
 import matplotlib.pyplot as plt
 
 def main():

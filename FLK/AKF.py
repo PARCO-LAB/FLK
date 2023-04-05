@@ -1,5 +1,5 @@
 import numpy as np
-from lib.RNN import GRU
+from .RNN import GRU
 
 class LKF():
     def __init__(self,s):

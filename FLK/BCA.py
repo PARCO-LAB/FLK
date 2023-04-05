@@ -1,4 +1,4 @@
-from lib.utils import *
+from .utils import *
 
 
 class Node():

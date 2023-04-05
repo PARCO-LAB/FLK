@@ -1,6 +1,6 @@
-from lib.AKF import AKF
-from lib.BCA import BCA
-from lib.LPF import EMA
+from .AKF import AKF
+from .BCA import BCA
+from .LPF import EMA
 
 class FLK:
     
