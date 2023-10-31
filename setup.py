@@ -8,8 +8,8 @@ with open("LICENSE") as f:
     license = f.read()
 
 setup(
-    name="FLK",
-    version="0.0.1",
+    name="flk",
+    version="0.0.2",
     description="Low-Latency Biomechanics-Aware Filter for Real-time 3D Human Pose Estimation",
     long_description=readme,
     author="Enrico Martini",

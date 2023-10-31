@@ -1,6 +1,10 @@
 import os
 import numpy as np
 import keras
+import tensorflow as tf
+gpus = tf.config.experimental.list_physical_devices('GPU')
+for gpu in gpus:
+  tf.config.experimental.set_memory_growth(gpu, True)
 
 # Disable boring logging of keras
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
