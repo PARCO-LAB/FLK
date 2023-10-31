@@ -1,5 +1,4 @@
 import numpy as np
-from .RNN import GRU
 
 class LKF():
     def __init__(self,s):
@@ -39,6 +38,7 @@ class AKF():
         self.fs = fs
         # Configure the prediction model
         if model_path:
+            from .RNN import GRU
             self.model = GRU(model_path = model_path, len_size=64, names=keypoints)
             self.is_RNN_enabled = True
             self.model.append(skeleton)
