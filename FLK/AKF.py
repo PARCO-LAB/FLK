@@ -1,5 +1,22 @@
+from typing import List
 import numpy as np
 
+class FakeModel():
+    raw: List[int]
+    def __init__(self) -> None:
+        self.raw = []
+    
+    def reset(self):
+        self.raw = []
+    
+    def append(self, x):
+        self.raw.append(x)
+    
+    def __len__(self):
+        return len(self.raw)
+    def __getitem__(self, i):
+        return self.raw[i]
+        
 class LKF():
     def __init__(self,s):
         self.X = np.array([[s]])
@@ -43,7 +60,9 @@ class AKF():
             self.is_RNN_enabled = True
             self.model.append(skeleton)
         else:
+            self.model = FakeModel()
             self.is_RNN_enabled = False
+        self.model.append(skeleton)
 
         self.alpha = 0.01
         self.theta = 0.75
