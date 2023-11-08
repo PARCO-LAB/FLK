@@ -47,18 +47,18 @@ class LKF():
 
 
 class AKF():
-    
-    def __init__(self,fs,skeleton,keypoints,model_path):
-        
+    num_dimension: int
+    def __init__(self,fs,skeleton,keypoints,model_path, num_dimension):
+        self.num_dimension = num_dimension
+
         # Initialize a Linear Kalman Filter for each coordinate of all joints
-        self.lkf = [LKF(skeleton[i]) for i in range(3*len(keypoints))]
+        self.lkf = [LKF(skeleton[i]) for i in range(self.num_dimension*len(keypoints))]
         self.fs = fs
         # Configure the prediction model
         if model_path:
             from .RNN import GRU
             self.model = GRU(model_path = model_path, len_size=64, names=keypoints)
             self.is_RNN_enabled = True
-            self.model.append(skeleton)
         else:
             self.model = FakeModel()
             self.is_RNN_enabled = False
@@ -77,7 +77,7 @@ class AKF():
             return self.model.raw[-1]        
 
     def compute_distance(self,a,b):
-        return np.sqrt( np.power(a[0]-b[0],2)+np.power(a[1]-b[1],2)+np.power(a[2]-b[2],2) )
+        return np.sqrt( sum([np.power(a[i]-b[i],2) for i in range(self.num_dimension)]) )
 
     def reset(self):
         if self.is_RNN_enabled:
@@ -92,12 +92,12 @@ class AKF():
         out = skeleton.copy()
 
         # Then correct the input skeleton with the 
-        for j in range(0,len(self.lkf),3):
-            v = abs(self.compute_distance(skeleton[j:j+3],self.old_skeleton[j:j+3]))/(1/self.fs)
-            v_pred = abs(self.compute_distance(pred[j:j+3],self.old_skeleton[j:j+3]))/(1/self.fs)
+        for j in range(0,len(self.lkf),self.num_dimension):
+            v = abs(self.compute_distance(skeleton[j:j+self.num_dimension],self.old_skeleton[j:j+self.num_dimension]))/(1/self.fs)
+            v_pred = abs(self.compute_distance(pred[j:j+self.num_dimension],self.old_skeleton[j:j+self.num_dimension]))/(1/self.fs)
             c =  1 / (self.alpha*( v**2)+1)
             confidence.append(c)
-            for k in range(0,3):
+            for k in range(0,self.num_dimension):
                 if c < self.theta or np.isnan(c):
                     if not np.isnan(skeleton[j+k]):
                         self.lkf[j+k].predict( pred[j+k], [(self.alpha-1)*np.exp(-self.alpha*v)+1])

@@ -11,8 +11,9 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 #keras.utils.disable_interactive_logging()
 
 class GRU():
-    
-    def __init__(self,model_path,len_size,names):
+    num_dimension: int
+    def __init__(self,model_path,len_size,names, num_dimension):
+        self.num_dimension = num_dimension
         self.history = []
         self.raw = []
         self.window = len_size        
@@ -21,31 +22,25 @@ class GRU():
         self.keypoints = ['RHip','RKnee','RAnkle','LHip','LKnee','LAnkle','LShoulder','LElbow','LWrist','RShoulder','RElbow','RWrist']
         
         # Create conversion maps from the input model to H36M13
-        self.generic_to_model = np.zeros((len(self.keypoints)*3,1))-1
-        self.model_to_generic = np.zeros((3*len(names),1))-1
+        self.generic_to_model = np.zeros((len(self.keypoints)*self.num_dimension,1))-1
+        self.model_to_generic = np.zeros((self.num_dimension*len(names),1))-1
         for i in range(len(self.keypoints)):
             for j in range(len(names)):
                 if names[j] == self.keypoints[i]:
-                    self.generic_to_model[3*i,0] = 3*j
-                    self.generic_to_model[3*i+1,0] = 3*j+1
-                    self.generic_to_model[3*i+2,0] = 3*j+2
-
-                    self.model_to_generic[3*j,0] = 3*i
-                    self.model_to_generic[3*j+1,0] = 3*i+1
-                    self.model_to_generic[3*j+2,0] = 3*i+2
+                    for idx in range(self.num_dimension):
+                        self.generic_to_model[self.num_dimension*i+idx,0] = self.num_dimension*j+idx
+                        self.model_to_generic[self.num_dimension*j+idx,0] = self.num_dimension*i+idx
 
     def remove_hip_center(self):
         sk = self.history[0]
         # Find right Hip and left Hip
         rx = 0
         lx = 9
-        cx = (sk[rx]+sk[lx]) / 2
-        cy = (sk[rx+1]+sk[lx+1]) / 2
-        cz = (sk[rx+2]+sk[lx+2]) / 2
-        
-        self.hip = np.transpose(np.array([cx,cy,cz]))
-        mask = np.tile(self.hip,(self.window,int(len(sk)/3)))
-        data = np.array(self.history).reshape((self.window,36))-mask
+
+        self.hip = np.transpose(np.array([(sk[rx+1]+sk[lx+1]) / 2 for i in range(self.num_dimension)]))
+        mask = np.tile(self.hip,(self.window,int(len(sk)/self.num_dimension)))
+        # TODO: parametrize by joint numbers?
+        data = np.array(self.history).reshape((self.window,12 * self.num_dimension))-mask
         
         self.mu = np.mean(data)
         self.sd = np.std(data)
@@ -77,10 +72,9 @@ class GRU():
 
     def translate(self,sk,p):
         new_sk = np.zeros(sk.shape)
-        for i in range(0,len(sk),3):
-            new_sk[i]   = sk[i] + p[0,0]
-            new_sk[i+1] = sk[i+1] + p[0,1]
-            new_sk[i+2] = sk[i+2] + p[0,2]
+        for i in range(0,len(sk),self.num_dimension):
+            for j in range(self.num_dimension):
+                new_sk[i+j] = sk[i+j] + p[0,j]
         return new_sk
 
     def transform(self,sk,conv, default=None):

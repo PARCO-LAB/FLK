@@ -22,15 +22,16 @@ class FLK:
                  latency: float=0,
                  enable_bones: bool=True,
                  enable_lowpass_filter: bool=True,
-                 ema_filter_value: float=0.99):
+                 ema_filter_value: float=0.99,
+                 num_dimension: int = 3):
 
-        self.akf = AKF(fs,skeleton,keypoints,model_path)
+        self.akf = AKF(fs,skeleton,keypoints,model_path, num_dimension)
                 
         # Default latency is set to 0
         self.latency = latency
         self.keypoints = keypoints
         if enable_bones:
-            self.bca = BCA(skeleton,keypoints)
+            self.bca = BCA(skeleton,keypoints, num_dimension)
         
         if enable_lowpass_filter:
             self.lpf = EMA(ema_filter_value,skeleton)

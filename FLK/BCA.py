@@ -27,14 +27,16 @@ class Link():
             self.length = np.mean(np.array(self.lengths), axis=0)
 
 class DAG():
-    
+    num_dimension: int
     def compute_distance(self,a,b):
-        return np.sqrt( np.power(a[0]-b[0],2)+np.power(a[1]-b[1],2)+np.power(a[2]-b[2],2) )
+        # return np.sqrt( np.power(a[0]-b[0],2)+np.power(a[1]-b[1],2)+np.power(a[2]-b[2],2) )
+        return np.sqrt( sum([np.power(a[i]-b[i],2) for i in range(self.num_dimension)]) )
 
-    def __init__(self, skeleton, keypoints):
+    def __init__(self, skeleton, keypoints, num_dimension):
+        self.num_dimension = num_dimension
         
         # For each keypoint create a node ad set the initial position
-        self.joints = [ Node(keypoints[i],skeleton[3*i:3*i+3]) for i in range(len(keypoints))]
+        self.joints = [ Node(keypoints[i],skeleton[num_dimension*i:num_dimension*i+num_dimension]) for i in range(len(keypoints))]
 
         self.bones = []
         self.bones.append(Link("RHumerus","RShoulder","RElbow"))
@@ -59,16 +61,18 @@ class DAG():
             try:
                 i1 = [idx for idx, l in enumerate(names) if b.from_kp in l][0]
                 i2 = [idx for idx, l in enumerate(names) if b.to_kp in l][0]
-                b.append(self.compute_distance(s[3*i1:3*i1+3],s[3*i2:3*i2+3]))
+                b.append(self.compute_distance(s[self.num_dimension*i1:self.num_dimension*i1+self.num_dimension],s[self.num_dimension*i2:self.num_dimension*i2+self.num_dimension]))
             except:
                 pass
     
 
 
 class BCA():
-    def __init__(self,skeleton, keypoints):
-        self.DAG = DAG(skeleton,keypoints)
+    num_dimension: int
+    def __init__(self,skeleton, keypoints, num_dimension):
+        self.DAG = DAG(skeleton,keypoints, num_dimension)
         self.epsilon = 0.01 # bone-length error treshold
+        self.num_dimension = num_dimension
         
     def reset(self):
         self.DAG.reset()
@@ -83,8 +87,8 @@ class BCA():
             if b.length and abs(b.length - b.lengths[-1])/b.length > self.epsilon:
                 a_i = names.index(b.from_kp)
                 b_i = names.index(b.to_kp)
-                A = s[3*a_i:3*a_i+3]
-                B = s[3*b_i:3*b_i+3]
-                s[3*b_i:3*b_i+3] = b.length * (B-A) / np.linalg.norm(B-A) + A
+                A = s[self.num_dimension*a_i:self.num_dimension*a_i+self.num_dimension]
+                B = s[self.num_dimension*b_i:self.num_dimension*b_i+self.num_dimension]
+                s[self.num_dimension*b_i:self.num_dimension*b_i+self.num_dimension] = b.length * (B-A) / np.linalg.norm(B-A) + A
         
         return s           
