@@ -13,4 +13,11 @@ class EMA:
     def correct(self,skeleton):
         val = np.array([e*self.alpha for e in skeleton])
         valold = np.array([(1-self.alpha)*e for e in self.prev])
-        return val+valold 
+        #return val+valold 
+        res = []
+        for i in range(len(val)):
+            if np.isnan(valold[i]):
+                res.append(skeleton[i])
+            else:
+                res.append(val[i]+valold[i])
+        return res

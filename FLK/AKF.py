@@ -27,7 +27,7 @@ class LKF():
         self.H = np.array([1]).reshape(1,1)
         self.R = 1 
         self.K = 0.5
-        self.wasnan = False
+        self.wasnan = True
 
     def predict(self,next,Q=0.05):
         self.Q = Q
@@ -45,7 +45,6 @@ class LKF():
     def get_output(self):
         return float(np.dot(self.H,self.X))
 
-
 class AKF():
     num_dimension: int
     def __init__(self,fs,skeleton,keypoints,model_path, num_dimension):
@@ -53,6 +52,12 @@ class AKF():
 
         # Initialize a Linear Kalman Filter for each coordinate of all joints
         self.lkf = [LKF(skeleton[i]) for i in range(self.num_dimension*len(keypoints))]
+        
+        # Each keypoints initialized with NaN is nan
+        for i in range(self.num_dimension*len(keypoints)):
+            if not np.isnan(skeleton[i]):
+                self.lkf[i].wasnan = False
+        
         self.fs = fs
         # Configure the prediction model
         if model_path:
@@ -84,35 +89,45 @@ class AKF():
             self.model.reset()
 
     def correct(self,skeleton):
-
+        
         # First of all predict the current frame
         pred = self.predict()
         confidence = []
 
-        out = skeleton.copy()
-
-        # Then correct the input skeleton with the 
+        # Then correct the input skeleton
         for j in range(0,len(self.lkf),self.num_dimension):
             v = abs(self.compute_distance(skeleton[j:j+self.num_dimension],self.old_skeleton[j:j+self.num_dimension]))/(1/self.fs)
             v_pred = abs(self.compute_distance(pred[j:j+self.num_dimension],self.old_skeleton[j:j+self.num_dimension]))/(1/self.fs)
             c =  1 / (self.alpha*( v**2)+1)
             confidence.append(c)
             for k in range(0,self.num_dimension):
+                # If the confidence it's above the threshold or it's invalid
                 if c < self.theta or np.isnan(c):
+                
+                    # If there is a keypoint in input but it's confidence is very low
                     if not np.isnan(skeleton[j+k]):
-                        self.lkf[j+k].predict( pred[j+k], [(self.alpha-1)*np.exp(-self.alpha*v)+1])
                         if self.lkf[j+k].wasnan:
-                            self.lkf[j+k].update(skeleton[j+k],0)
-                            self.lkf[j+k].wasnan = False
+                            self.lkf[j+k] = LKF(skeleton[j+k])
                         else:
-                            self.lkf[j+k].update(skeleton[j+k],[self.alpha*v**2])
+                            self.lkf[j+k].predict( pred[j+k], [(self.alpha-1)*np.exp(-self.alpha*v)+1])
+                            if self.lkf[j+k].wasnan:
+                                self.lkf[j+k].update(skeleton[j+k],0)
+                                self.lkf[j+k].wasnan = False
+                            else:
+                                self.lkf[j+k].update(skeleton[j+k],[self.alpha*v**2])
+                    # If there isn't a keypoint
                     else:
-                        self.lkf[j+k].predict( pred[j+k], [(self.alpha-1)*np.exp(-self.alpha*v_pred)+1])
-                        self.lkf[j+k].wasnan = True
-                    skeleton[j+k] = self.lkf[j+k].get_output()
+                        # If before there wasn't any keypoints, keep it
+                        if not self.lkf[j+k].wasnan:
+                            self.lkf[j+k].predict( pred[j+k], [(self.alpha-1)*np.exp(-self.alpha*v_pred)+1])
+                            skeleton[j+k] = self.lkf[j+k].get_output()
+                            self.lkf[j+k].wasnan = True
+                # Keep the keypoint in input as is
                 else:
+                    if self.lkf[j+k].wasnan:
+                        self.lkf[j+k] = LKF(skeleton[j+k])
+                        self.lkf[j+k].wasnan = False
                     self.lkf[j+k].X = np.array(skeleton[j+k])
-
-
+        
         self.model.append(skeleton.copy())
         return skeleton

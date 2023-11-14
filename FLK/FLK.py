@@ -76,9 +76,10 @@ class FLK:
         if self.bca is not None:
             filtered = self.bca.correct(filtered,self.keypoints)
 
+        
         if self.lpf is not None:
             filtered = self.lpf.correct(filtered)
-
+        
         if self.latency == 0:
             self.akf.old_skeleton = filtered
             return filtered
