@@ -1,11 +1,18 @@
-from scipy.signal import butter, filtfilt
+from scipy.signal import butter, filtfilt, lfilter
 import numpy as np
 
-class BF:
-    def __init__(self,latency,order,cutoff,fs) :
-            self.latency = latency
-            self.b, self.a = butter(N=order, Wn=cutoff, btype='low', analog=False, fs=fs)
-
+# class BF:
+#     def __init__(self,latency,order,cutoff,fs) :
+#         order = 4
+#         cutoff_frequency = 5.0
+#         sampling_frequency = 100.0
+#         self.latency = latency
+#         self.b, self.a = butter(order, cutoff_frequency / (sampling_frequency / 2), btype='low')
+    
+#     def correct(self,skeleton):
+#         val = filtfilt(self.b, self.a, skeleton)
+        
+        
 class EMA:
     def __init__(self,alpha,prev) -> None:
         self.alpha = alpha
@@ -20,4 +27,6 @@ class EMA:
                 res.append(skeleton[i])
             else:
                 res.append(val[i]+valold[i])
+        self.prev = res
         return res
+    

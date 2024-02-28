@@ -21,9 +21,8 @@ class Link():
 
     def append(self,l):
         self.lengths.append(l) 
-
-        # At least 20 samples with a variance less than 2 cm
-        if self.length or ( len(self.lengths) > 20 and np.std(np.array(self.lengths), axis=0) < 0.02 ):
+        # At least 5 samples with a variance less than 5 cm
+        if self.length or ( len(self.lengths) > 5 and np.std(np.array(self.lengths), axis=0) < 0.05 ):
             self.length = np.mean(np.array(self.lengths), axis=0)
 
 class DAG():
@@ -78,7 +77,6 @@ class BCA():
         self.DAG.reset()
 
     def correct(self,s,names):
-        
         # Update with the current measurement
         self.DAG.update_bone_length(s,names)
         
