@@ -1,4 +1,4 @@
-from typing import Dict, Optional, List, Any
+from typing import Dict, Optional, List, Any, Union
 import numpy as np
 import numpy.typing as npt
 
@@ -6,7 +6,7 @@ from .AKF import AKF
 from .BCA import BCA
 from .LPF import EMA
 
-Skeleton = npt.NDArray[Any] or List[int or float]
+Skeleton = Union[npt.NDArray[Any],List[Union[int, float]]]
 
 class FakeDict(object):
     _dict: Dict[Any, Any]
@@ -83,9 +83,8 @@ class FLK:
         if self.latency == 0:
             self.akf.old_skeleton = filtered
             return filtered
-        
         else:
-            pass
+            raise NotImplementedError("Latency non 0 not implemented yet!")
     
     def correct_np(self,skeleton_np: npt.NDArray[Any]):
 
@@ -101,7 +100,8 @@ class FLK:
 
         if self.latency == 0:
             self.akf.old_skeleton = filtered
-            return filtered.reshape(12,self.num_dimension)
+            a = np.array(filtered)
+            return a.reshape(len(self.keypoints),self.num_dimension)
         
         else:
-            pass
+            raise NotImplementedError("Latency non 0 not implemented yet!")
