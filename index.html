@@ -1,0 +1,205 @@
+
+<!Doctype html>
+<html lang="en">
+    <head>
+        <title>FLK: a Filter with Learned Kinematics for Real-time 3D Human Pose Estimation </title>
+        
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="author" content="Despoina Paschalidou">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" type="image/png" href="data/bunny.png"/>
+
+        <link rel="stylesheet" type="text/css" href="style_project_page.css?cache=7754391418498779889">
+        <link href="https://fonts.googleapis.com/css?family=Arvo|Roboto&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css">
+        <link rel="stylesheet" href="https://unpkg.com/@glidejs/glide/dist/css/glide.core.min.css">
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+        <script src="https://unpkg.com/@glidejs/glide"></script>
+        <style type="text/css">
+            .side-text {
+                width:60%;
+                display:inline-block;
+                vertical-align:top;
+            }
+            .side-image {
+                width: 38%;
+                display: inline-block;
+                vertical-align: top;
+            }
+            .controls {
+                margin-bottom: 10px;
+            }
+            .left-controls {
+                display: inline-block;
+                vertical-align: top;
+                width: 80%;
+            }
+            .right-controls {
+                display: inline-block;
+                vertical-align: top;
+                width: 19%;
+                text-align: right;
+            }
+            .render_window {
+                display: inline-block;
+                vertical-align: middle;
+                box-shadow: 1px 0px 5px black;
+                margin-right: 10px;
+                margin-bottom: 10px;
+                width: calc(33% - 10px);
+            }
+            .progress {
+                background: #666;
+                position: relative;
+                height: 5px;
+                margin-bottom: -5px;
+                display: none;
+            }
+            .glide__slide:hover {cursor: grab;}
+            .glide__slide:active {cursor: grabbing;}
+            .glide__slide img {width: 90%;}
+            .glide__bullets {
+                text-align: center;
+            }
+            .glide__bullet--active {
+                color: #aaa; 
+            }
+
+            @media (max-width: 400px) {
+                .render_window {
+                    display: block;
+                    width: 90%;
+                    margin: 10px auto;
+                }
+            }
+            @media (max-width: 700px) {
+                .side-image {
+                    display: block;
+                    width: 80%;
+                    margin: 10px auto;
+                }
+                .side-text {
+                    display: block;
+                    width: 100%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="section">
+            <h1 class="project-title">
+                FLK: a Filter with Learned Kinematics for Real-time 3D Human Pose Estimation
+            </h1>
+            <!-- <center> <a href=https://eccv2022.ecva.net/> European Conference on Computer Vision (ECCV), 2022</a></center> -->
+            <div class="authors">
+                <a href=https://scholar.google.com/citations?hl=it&user=m4TgsRMAAAAJ>
+                    Enrico Martini <sup>1</sup>
+                </a>
+                <a href=https://scholar.google.com/citations?hl=it&user=UH1sy14AAAAJ>
+                    Michele Boldo <sup>1</sup>
+                </a>
+                <a href="https://scholar.google.com/citations?hl=it&user=eLA-qo8AAAAJ">
+                    Nicola Bombieri <sup>1</sup>
+                </a>
+            </div>
+
+            <div class="affiliations">
+                <span><sup>1</sup> University of Verona</span>
+            </div>
+
+
+            <div class="project-icons">
+                <a href="https://github.com/PARCO-LAB/FLK">
+                    <i class="fa fa-file"></i> <br/>
+                    Paper
+                </a>
+                
+                <a href="https://github.com/PARCO-LAB/FLK">
+                    <i class="fa fa-github"></i> <br/>
+                    Code
+                </a>
+            </div>
+<!--
+                <a href="">
+                    <i class="fa fa-youtube-play"></i> <br/>
+                    Video
+                </a>
+                <a href="">
+                    <i class="fa fa-picture-o"></i> <br/>
+                    Poster
+                </a>
+                <a href="">
+                    <i class="fa fa-file-powerpoint-o"></i> <br/>
+                    Slides
+                </a>
+                <a href="">
+                    <i class="fa fa-newspaper-o"></i> <br/>
+                    Blog
+                </a>
+            </div>
+-->
+
+            <!--TODO: the main video-->
+            <!--
+            <div class="video">
+                <iframe width="860" height="485" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            -->
+
+            <div class="section-title">Abstract</div>
+            <div class="content">
+                There is a growing interest in adopting 3D human pose estimation in safety-critical systems, from healthcare to Industry 5.0. 
+                Nevertheless, when applied in such settings, these neural networks may suffer from estimation inaccuracy. 
+                Besides imprecise or inconsistent annotations in the training dataset, the inaccuracy is caused by poor image quality, rare poses, dropped frames, or heavy occlusions in the scene. 
+                In addition, these scenarios often require the software results to have temporal constraints, such as real-time and zero- or low-latency, which make many of the filtering solutions proposed in the literature inapplicable. 
+                This paper proposes FLK, a Filter with Learned Kinematics, to refine 3D human motion data in real-time and at zero/low latency. The temporal core combines a Kalman filter and a low-pass filter, which learns the motion model through a recurrent neural network. 
+                The spatial core takes advantage of the biomechanical constraints of the human body to provide spatial coherency between keypoints. 
+                The combination of the cores allows the filter to adequately address different types of noise, from jittering to dropped frames. 
+                We test the filter on motion data from multiple datasets and backbones, improving accuracy up to 140 mm with non-Gaussian noise and 53 mm with missing information.
+            </div>
+            <img src="figures/general_pipeline.jpg" style="width:100%;">
+            <br/>
+            <br/>
+              <!-- <hr>
+
+              <center>
+                  <h1>Demo of FLK</h1>
+                  <iframe width="960" height="540" src="https://www.youtube.com/embed/ijNUEmtxOLQ"></iframe>
+              </center>
+
+              <br><br>
+
+              <hr> -->
+            <!--TODO: explaination-->
+        </div>
+
+            <div class="section-title">BibTeX</div>
+            <div class="content">
+            <pre align="left">@inprogress{
+                }          </pre>
+            </div>
+
+            <div class="section-title">Contact</div>
+            <div class="content">
+            <p>If any questions, please contact Enrico Martini (<a href="enrico.martini@univr.it">enrico.martini@univr.it</a>).</p> 
+            </div>
+<!--
+            <div>
+                <img style="width: 40%;" src="//www.clustrmaps.com/map_v2.png?d=PVOv3PUR0Cb4eIz-nD2-yLc8KtqyAPlDB_-7h_AX8M0&cl=ffffff"/>
+            </div>
+-->
+        <script>
+            // Make the carousel for the comparisons
+            var glide = new Glide(".glide", {
+                type: "carousel",
+                startAt: 0,
+                perView: 1,
+                autoplay: 2000
+            }).mount();
+        </script>
+    
+
+    </body>
+</html>

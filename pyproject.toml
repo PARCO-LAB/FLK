@@ -4,7 +4,7 @@ version = "0.0.1"
 authors = [
   { name="Enrico Martini", email="enrico.martini@univr.it" },
 ]
-description = "Filtering human motion in real-time"
+description = "a Filter with Learned Kinematics for Real-time 3D Human Pose Estimation"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [

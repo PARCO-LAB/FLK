@@ -1,5 +1,7 @@
 # Custom defined 
 .DS_Store
+example_2D.py
+MANIFEST.in
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
