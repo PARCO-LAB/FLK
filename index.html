@@ -1,140 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Website for FLK">
+  <meta name="keywords" content="Human Motion Refinement, Human Pose Estimation, Filtering, Denoising, Completion, Kalman Filter">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FLK: a Filter with Learned Kinematics for Real-time 3D Human Pose Estimation</title>
 
-<!Doctype html>
-<html lang="en">
-    <head>
-        <title>FLK: a Filter with Learned Kinematics for Real-time 3D Human Pose Estimation</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <meta name="author" content="Despoina Paschalidou">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="icon" type="image/png" href="data/bunny.png"/>
+  <style>
+    .responsive-image {    
+        display: block;    
+        margin-left: auto;
+        margin-right: auto;
+        width: 90%;
+    }
+</style>
 
-        <link rel="stylesheet" type="text/css" href="style_project_page.css?cache=7754391418498779889">
-        <link href="https://fonts.googleapis.com/css?family=Arvo|Roboto&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css">
-        <link rel="stylesheet" href="https://unpkg.com/@glidejs/glide/dist/css/glide.core.min.css">
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-        <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-        <script src="https://unpkg.com/@glidejs/glide"></script>
-        <style type="text/css">
-            .side-text {
-                width:60%;
-                display:inline-block;
-                vertical-align:top;
-            }
-            .side-image {
-                width: 38%;
-                display: inline-block;
-                vertical-align: top;
-            }
-            .controls {
-                margin-bottom: 10px;
-            }
-            .left-controls {
-                display: inline-block;
-                vertical-align: top;
-                width: 80%;
-            }
-            .right-controls {
-                display: inline-block;
-                vertical-align: top;
-                width: 19%;
-                text-align: right;
-            }
-            .render_window {
-                display: inline-block;
-                vertical-align: middle;
-                box-shadow: 1px 0px 5px black;
-                margin-right: 10px;
-                margin-bottom: 10px;
-                width: calc(33% - 10px);
-            }
-            .progress {
-                background: #666;
-                position: relative;
-                height: 5px;
-                margin-bottom: -5px;
-                display: none;
-            }
-            .glide__slide:hover {cursor: grab;}
-            .glide__slide:active {cursor: grabbing;}
-            .glide__slide img {width: 90%;}
-            .glide__bullets {
-                text-align: center;
-            }
-            .glide__bullet--active {
-                color: #aaa; 
-            }
+<style>
+    ul {
+        list-style-type: none; /* Remove default bullet points */
+    }
 
-            @media (max-width: 400px) {
-                .render_window {
-                    display: block;
-                    width: 90%;
-                    margin: 10px auto;
-                }
-            }
-            @media (max-width: 700px) {
-                .side-image {
-                    display: block;
-                    width: 80%;
-                    margin: 10px auto;
-                }
-                .side-text {
-                    display: block;
-                    width: 100%;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="section">
-            <center>
-            <h1 class="project-title">
-                FLK:  a Filter with Learned Kinematics for Real-time 3D Human Pose Estimation
-            </h1>
-             <!-- <a href=https://eccv2022.ecva.net/> European Conference on Computer Vision (ECCV), 2022</a> -->
-            <div class="authors">
-                <a href=https://scholar.google.com/citations?hl=it&user=m4TgsRMAAAAJ>
-                    Enrico Martini,
+    ul li::before {
+        content: "-"; /* Set '-' as the content before each list item */
+        margin-right: 8px; /* Add some space between '-' and the text */
+    }
+</style>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<!-- <nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div class="navbar-menu">
+    <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+      <a class="navbar-item" href="https://samin.netlify.app">
+      <span class="icon">
+          <i class="fas fa-home"></i>
+      </span>
+      </a>      
+    </div>
+  </div>
+</nav> -->
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">FLK: a Filter with Learned Kinematics for Real-time 3D Human Pose Estimation</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?hl=it&user=m4TgsRMAAAAJ">Enrico Martini</a>,</span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?hl=it&user=UH1sy14AAAAJ">Michele Boldo</a>,</span>
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?hl=it&user=eLA-qo8AAAAJ">Nicola Bombieri</a>,
+            </span>            
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Department of Engineering for Innovation Medicine,</span><br>
+            <span class="author-block">University of Verona, Italy</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://github.com/PARCO-LAB/FLK"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
                 </a>
-                <a href=https://scholar.google.com/citations?hl=it&user=UH1sy14AAAAJ>
-                    Michele Boldo,
-                </a>
-                <a href="https://scholar.google.com/citations?hl=it&user=eLA-qo8AAAAJ">
-                    Nicola Bombieri
-                </a>
+              </span>              
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/PARCO-LAB/FLK"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <!-- Dataset Link. -->
+              <!-- <span class="link-block">
+                <a href="https://drive.google.com/drive/folders/1UvcFVPG2TdiaZAsWLX6eSbrvo_UWShB_"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="far fa-images"></i>
+                  </span>
+                  <span>Data</span>
+                  </a> -->
+
+                  <span class="link-block">
+                    <a href="https://youtu.be/T0_l6Qvvhsg"
+                       class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                          <i class="fab fa-youtube"></i>
+                      </span>
+                      <span>Video</span>
+                    </a>
+                    <!-- <a href="https://youtu.be/SLCfGewg8zg"
+                       class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                          <i class="fab fa-youtube"></i>
+                      </span>
+                      <span>Video</span>
+                    </a> -->
+                  </span>
             </div>
-            
-            <div class="affiliations">
-                <span> University of Verona, Verona, Italy</span>
-            </div>
-            <!-- <center> -->
-                <div class="links">
-                    <a href="https://github.com/PARCO-LAB/FLK">
-                        Paper <i class="fa fa-file"></i> 
-                    </a>&nbsp;&nbsp;&nbsp;
-                    <a href="https://github.com/PARCO-LAB/FLK">
-                        GitHub <i class="fa fa-github"></i>
-                    </a>
-                </div>
-            </center>
-                <!-- <div class="project-icons">
-                    <a href="https://github.com/PARCO-LAB/FLK">
-                        <i class="fa fa-file"></i> <br/>
-                        Paper
-                    </a>
-                    <a href="https://github.com/PARCO-LAB/FLK">
-                        <i class="fa fa-github"></i> <br/>
-                        Code
-                    </a>
-                </div> -->
-        <!-- </center> -->
-        <br>
-            <center>
-            <h3>Abstract</h3>
-        </center>
-            <div class="content">
-                There is a growing interest in adopting 3D human pose estimation in safety-critical systems, from healthcare to Industry 5.0. 
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Paper video. -->
+<div class="columns is-centered has-text-centered">
+    <div class="column is-four-fifths">
+      <!-- <h2 class="title is-3">Video</h2> -->
+      <div class="publication-video">
+        <iframe src="https://www.youtube.com/embed/MrKrnHhk8IA?rel=0&amp;showinfo=0"
+                frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            There is a growing interest in adopting 3D human pose estimation in safety-critical systems, from healthcare to Industry 5.0. 
                 Nevertheless, when applied in such settings, these neural networks may suffer from estimation inaccuracy. 
                 Besides imprecise or inconsistent annotations in the training dataset, the inaccuracy is caused by poor image quality, rare poses, dropped frames, or heavy occlusions in the scene. 
                 In addition, these scenarios often require the software results to have temporal constraints, such as real-time and zero- or low-latency, which make many of the filtering solutions proposed in the literature inapplicable. 
@@ -142,53 +173,57 @@
                 The spatial core takes advantage of the biomechanical constraints of the human body to provide spatial coherency between keypoints. 
                 The combination of the cores allows the filter to adequately address different types of noise, from jittering to dropped frames. 
                 We test the filter on motion data from multiple datasets and backbones, improving accuracy up to 140 mm with non-Gaussian noise and 53 mm with missing information.
-            </div>
-            <br>
-            <center>
-            <img src="figures/general_pipeline.jpg" style="width:100%;">
-            </center>
-            <br/>
-            <br/>
-              <!-- <hr> -->
-              <center>
-                  <h3>Qualitative results</h3>
-                  <iframe  src="https://youtu.be/T0_l6Qvvhsg"></iframe>
-                  <iframe  src="https://youtu.be/SLCfGewg8zg"></iframe>
-              <!-- width="960" height="540" -->
-                </center>
-              <br><br>
-
-              <!-- <hr> -->
-            <!--TODO: explaination-->
+          </p>
         </div>
+      </div>
+    </div>
+    <!--/ Abstract. -->
+    <!--/ Paper video. -->
+</div><br>
+<img src="figures/general_pipeline.jpg" alt="Interact-banner" class="responsive-image">
+  <!-- <center><img src="figures/general_pipeline.jpg" alt="Interact-banner" style="width:80%;"></center> -->
+  
+</section>
+<!-- <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3">PoseTron: A Multimodal transformer for multi-agent motion prediction</h2>
+      <p>It features:</p>
+      <ul>
+          <li>Multimodal Pose Encoder for encoding pose information for multiple agents</li>          
+          <li>Multimodal Pose Decoder for auto-regressively predicitng future pose information</li>          
+      </ul>
+      
+    <img src="./static/images/posetron_architecture.png" alt="PoseTron-banner" class="responsive-image">          
+</section> -->
 
-        <br>
-        <center><h3>Citation</h3></center>
-            <div class="content">
-            <pre align="left">@inprogress{}          </pre>
-            </div>
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@inproceedings{todo,
+    }
+}</code></pre>
+  </div>
+</section>
 
-            <center>
-                <h3>Contact</h3>
-            </center>
-            <div class="content">
-            <p>If any questions, please contact Enrico Martini (<a href="enrico.martini@univr.it">enrico.martini@univr.it</a>).</p> 
-            </div>
-<!--
-            <div>
-                <img style="width: 40%;" src="//www.clustrmaps.com/map_v2.png?d=PVOv3PUR0Cb4eIz-nD2-yLc8KtqyAPlDB_-7h_AX8M0&cl=ffffff"/>
-            </div>
--->
-        <script>
-            // Make the carousel for the comparisons
-            var glide = new Glide(".glide", {
-                type: "carousel",
-                startAt: 0,
-                perView: 1,
-                autoplay: 2000
-            }).mount();
-        </script>
-    
 
-    </body>
+<footer class="footer">
+  <div class="container">    
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="https://creativecommons.org/licenses/by-nc-nd/4.0/">Attribution-NonCommercial-NoDerivs 
+                                                4.0 International License</a>.
+          </p>
+          <p>
+            Website borrowed from  <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> 
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
 </html>
