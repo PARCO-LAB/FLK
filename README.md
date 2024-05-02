@@ -1,4 +1,5 @@
-# FLK: a Low-Latency Biomechanics-Aware Filter for Real-time 3D Human Pose Estimation
+# FLK: a Filter with Learned Kinematics for Real-time 3D Human Pose Estimation
+[Official website](https://parco-lab.github.io/FLK/)
 
 There is a growing interest in adopting 3D human pose estimation (HPE) in safety-critical systems, from Healthcare to Industry 5.0. Nevertheless, when applied in such scenarios, state-of-the-art HPE platforms suffer from estimation inaccuracy due to different reasons. Besides imprecise or inconsistent annotations in the training dataset, the inaccuracy is due to poor image quality, rare poses, dropped frames, or heavy occlusions in the real scene. In addition, these scenarios often require the software results with temporal constraints, such as real-time and zero- or low-latency, which make many of the filtering solutions proposed in literature inapplicable.
 
