@@ -6,22 +6,30 @@ There is a growing interest in adopting 3D human pose estimation (HPE) in safety
 We propose FLK, a spatio-temporal filter to refine 3D human motion data in real-time and at zero/low latency. The temporal core combines an adaptive Kalman filter, in which the motion model is learnt through a recurrent neural network, and a low-pass filter. The spatial core takes advantage of biomechanical constraints of the human body to provide spatial coherency between keypoints. The combination of the cores allows the filter to properly address different types of noise, from jittering to dropped frames.
 
 ## Installation
+Create a virtual environment:
+```
+git clone git@github.com:PARCO-LAB/FLK.git
+cd FLK
+python3.8 -m virtualenv .venv
+source .venv/bin/activate
+```
+
+Install the requirements:
+
+```
+pip install -r requirements.txt
+```
+
+PS: if you encounter any trouble, you need to install **tensorflow** following the [official instructions](https://www.tensorflow.org/install).
+
+Install the package:
+
 ```
 python3 -m pip install --upgrade build
 python3 -m build
 cd dist
 pip3 install flk-0.0.1-py3-none-any.whl
 ```
-
-
-## Requirements
-To install the requirements:
-
-```
-pip install -r requirements.txt
-```
-
-Also, you need to install **tensorflow** following the [official instructions](https://www.tensorflow.org/install).
 
 ## How to run the demo
 

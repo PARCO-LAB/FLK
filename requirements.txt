@@ -1,2 +1,4 @@
+tensorflow==2.13.0
 pandas
-keras
+scipy
+matplotlib
